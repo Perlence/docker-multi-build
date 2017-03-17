@@ -14,7 +14,22 @@ setup(
     author_email='dust.harvesting@gmail.com',
     url='https://github.com/Perlence/docker-multi-build',
     packages=find_packages(),
-    install_requires=[],
+    zip_safe=False,
+    entry_points={
+        'console_scripts': [
+            'docker-multi-build = docker_multi_build.cli:cli',
+        ],
+    },
+    setup_requires=[
+        'pytest-runner'
+    ],
+    install_requires=[
+        'click>=6',
+        'PyYAML',
+    ],
+    tests_require=[
+        'pytest',
+    ],
     long_description=long_description,
     classifiers=[
         "Programming Language :: Python",
