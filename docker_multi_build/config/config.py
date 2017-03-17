@@ -7,6 +7,7 @@ import yaml
 
 @attr.s
 class BuildConfig:
+    tag = attr.ib()
     dockerfile = attr.ib()
     context = attr.ib(default='.')
     args = attr.ib(default=Factory(dict))
@@ -28,12 +29,12 @@ def load(stream):
     for tag, raw_config in data.items():
         if raw_config is None:
             raw_config = {}
-        config = _load_build_config(raw_config)
+        config = _load_build_config(tag, raw_config)
         configs[tag] = config
     return configs
 
 
-def _load_build_config(raw_config):
+def _load_build_config(tag, raw_config):
     dockerfile = _load_dockerfile(raw_config.get('dockerfile', 'Dockerfile'))
     context = raw_config.get('context', BuildConfig.context.default)
     args = raw_config.get('args', NOTHING)
@@ -42,7 +43,7 @@ def _load_build_config(raw_config):
         exports = list(_load_exports(raw_exports))
     else:
         exports = NOTHING
-    return BuildConfig(dockerfile, context, args, exports)
+    return BuildConfig(tag, dockerfile, context, args, exports)
 
 
 def _load_dockerfile(path_or_stream):

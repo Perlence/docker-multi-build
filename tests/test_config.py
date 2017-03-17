@@ -3,12 +3,13 @@ import io
 from click.testing import CliRunner
 import pytest
 
-from docker_multi_build.build_config import BuildConfig, BuildExport, load
+from docker_multi_build.config.config import BuildConfig, BuildExport, load
 
 table_load = [(
     'image_a:\n',
     {
         'image_a': BuildConfig(
+            tag='image_a',
             dockerfile='FROM busybox\nCMD ["/bin/true"]\n',
             context='.',
             args={},
@@ -25,6 +26,7 @@ table_load = [(
     '    - /out/dumb-init_1.2.0_amd64:vendor/\n',
     {
         'image_a': BuildConfig(
+            tag='image_a',
             dockerfile='FROM debian:jessie\nCMD ["/bin/true"]\n',
             context='.',
             args={'beep': 'boop'},
