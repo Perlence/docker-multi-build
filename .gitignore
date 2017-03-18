@@ -20,7 +20,7 @@ lib64/
 parts/
 sdist/
 var/
-*.egg-info/
+*.egg-info
 .installed.cfg
 *.egg
 
@@ -59,8 +59,12 @@ docs/_build/
 # PyBuilder
 target/
 
-#Ipython Notebook
+# IPython Notebook
 .ipynb_checkpoints
 
 # pyenv
 .python-version
+py36/
+
+tags
+Session.vim
