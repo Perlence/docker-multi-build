@@ -9,6 +9,9 @@ def parse(lines):
 
 
 def tokenize(lines):
+    # The function is taken from
+    # https://github.com/DBuildService/dockerfile-parse with minor
+    # changes
     instructions = []
     lineno = -1
     insnre = re.compile(r'^\s*(\w+)\s+(.*)$')  # matched group is insn
