@@ -1,6 +1,6 @@
 import pytest
 
-from docker_multi_build.config.dockerfile import Token, tokenize
+from docker_multi_build.dockerfile import Token, tokenize
 
 
 NON_ASCII = "žluťoučký"

@@ -3,7 +3,7 @@ import io
 from click.testing import CliRunner
 import pytest
 
-from docker_multi_build.config.config import BuildConfig, BuildExport, load
+from docker_multi_build.config import BuildConfig, BuildExport, load
 
 table_load = [(
     'image_a:\n',

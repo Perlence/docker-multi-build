@@ -8,7 +8,7 @@ import yaml
 @attr.s
 class BuildConfig:
     tag = attr.ib()
-    dockerfile = attr.ib()
+    dockerfile = attr.ib(repr=False)
     context = attr.ib(default='.')
     args = attr.ib(default=Factory(dict))
     exports = attr.ib(default=Factory(list))
