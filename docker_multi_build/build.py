@@ -93,6 +93,7 @@ class Builder:
         self.export()
 
     def write_dockerfile(self):
+        # TODO: Don't write Dockerfile if it's not inline
         with open(self.dockerfile_path, 'w') as fp:
             fp.write(self.config.dockerfile)
 
