@@ -1,3 +1,4 @@
+from functools import partial
 import os
 from os import path
 import time
@@ -90,7 +91,7 @@ ENTRYPOINT ["dumb-init", "--"]
 """),
     }
 
-    b = Builder(client=docker_in_docker)
+    b = partial(Builder, client=docker_in_docker)
     cb = MultiBuilder(builder=b)
     build_all(configs, multi_builder=cb)
 
@@ -106,8 +107,7 @@ def docker_in_docker():
 
     name = 'docker_multi_build_dind'
     dind = host_client.containers.run(
-        'docker:17.03.0-ce-dind', name=name,
-        detach=True, privileged=True,
+        'docker:17.03.0-ce-dind', name=name, detach=True, privileged=True,
         volumes={'docker_multi_build_dind_data': {'bind': '/var/lib/docker', 'mode': 'rw'}},
         ports={'2375/tcp': (host, port)})
 

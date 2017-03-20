@@ -33,7 +33,7 @@ class MultiBuilder:
 
     def __attrs_post_init__(self):
         if self.builder is None:
-            self.builder = Builder()
+            self.builder = Builder
         if self.executor is None:
             self.executor = futures.ThreadPoolExecutor()
 
@@ -45,7 +45,7 @@ class MultiBuilder:
         to_run = set(self.configs)
         with self.executor:
             while self.completed < to_run:
-                fs = {self.executor.submit(self.builder.build, self.configs[tag]): tag
+                fs = {self.executor.submit(self.builder().build, self.configs[tag]): tag
                       for tag in self.ready_to_build()}
                 for f in futures.as_completed(fs):
                     f.result()
