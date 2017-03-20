@@ -1,8 +1,9 @@
 from concurrent import futures
+import os
 from os import path
 import re
-import subprocess
 import tarfile
+import tempfile
 
 import attr
 import docker
@@ -123,40 +124,50 @@ class Builder:
 
     def export(self):
         container = self.client.containers.create(self.config.tag)
-        for exported_path in self.config.exports:
-            # TODO: Implement 'docker cp' in Python
-            docker_host = self.client.api.base_url.replace('http://', 'tcp://')
-            src_path = exported_path.container_src_path
-            dest_path = path.join(self.config.context, exported_path.dest_path)
-            process = subprocess.Popen(['docker', '-H', docker_host, 'cp',
-                                        '{}:{}'.format(container.id, src_path),
-                                        dest_path], stdout=subprocess.PIPE)
-            with process:
-                for line in process.stdout:
-                    self.redirect_output(line)
-            if process.returncode:
-                raise subprocess.CalledProcessError(process.returncode, process.args)
-        container.remove()
+        try:
+            for exported_path in self.config.exports:
+                docker_copy(container, exported_path.container_src_path, exported_path.dest_path)
+        finally:
+            container.remove()
 
     def redirect_output(self, line):
         print(self.config.tag, '|', line, end='')
 
 
 def docker_copy(container, src_path, dest_path):
+    copy_contents = False
+    if src_path.endswith('/.'):
+        src_path = path.dirname(src_path)
+        copy_contents = True
+
     tar_stream, _ = container.get_archive(src_path)
-    with tarfile.TarFile(fileobj=tar_stream) as tf:
-        member = tf.getmember(src_path)
-        if not member.isdir():
-            if not path.exists(dest_path):
-                if dest_path.endswith('/'):
-                    raise ValueError("the destination directory '{}' must exist".format(dest_path))
-                tf.extract(member, dest_path)
+    with tempfile.TemporaryFile() as tmp:
+        for chunk in tar_stream:
+            tmp.write(chunk)
+        tmp.seek(0)
+
+        with tarfile.TarFile(fileobj=tmp) as tf:
+            member = tf.getmember(path.basename(src_path))
+
+            if not member.isdir():
+                if not path.exists(dest_path) and dest_path.endswith('/'):
+                    raise Exception("the destination directory '{}' must exist".format(dest_path))
+                if path.isdir(dest_path):
+                    dest_path = path.join(dest_path, path.basename(member.name))
+                member.name = dest_path
+                tf.extract(member)
+
             else:
-                if path.isfile(dest_path):
-                    tf.extract(member, dest_path)
+                dest_path_existed = path.exists(dest_path)
+                if dest_path_existed:
+                    if not path.isdir(dest_path):
+                        raise Exception('cannot copy a directory to a file')
                 else:
-                    # TODO: Join two clauses?
-                    tf.extract(member, dest_path)
-        else:
-            if not path.exists(dest_path):
-                ...
+                    os.mkdir(dest_path)
+                for m in tf.members:
+                    if not copy_contents and dest_path_existed:
+                        if m.name.startswith(member.name):
+                            tf.extract(m, dest_path)
+                    elif m != member and m.name.startswith(member.name):
+                        m.name = m.name.replace(member.name + '/', '', 1)
+                        tf.extract(m, dest_path)
