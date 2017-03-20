@@ -43,9 +43,7 @@ def test_load(dockerfile, source, expected):
 
 
 @pytest.fixture
-def dockerfile():
-    runner = CliRunner()
-    with runner.isolated_filesystem():
-        with open('Dockerfile', 'w') as fp:
-            fp.write('FROM busybox\nCMD ["/bin/true"]\n')
-        yield 'Dockerfile'
+def dockerfile(isolated_filesystem):
+    with open('Dockerfile', 'w') as fp:
+        fp.write('FROM busybox\nCMD ["/bin/true"]\n')
+    yield 'Dockerfile'
