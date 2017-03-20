@@ -24,7 +24,9 @@ setup(
         'pytest-runner'
     ],
     install_requires=[
+        'attr',
         'click>=6',
+        'docker',
         'PyYAML',
     ],
     tests_require=[
