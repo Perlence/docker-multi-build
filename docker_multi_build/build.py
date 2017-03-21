@@ -1,6 +1,5 @@
 from concurrent import futures
 import os
-from os import path
 import re
 import tarfile
 import tempfile
@@ -90,13 +89,13 @@ class Builder:
         if self.config.dockerfile.name is not None:
             return
 
-        self.config.dockerfile.name = path.join(self.config.context, 'Dockerfile.' + self.config.tag)
+        self.config.dockerfile.name = os.path.join(self.config.context, 'Dockerfile.' + self.config.tag)
         with open(self.config.dockerfile.name, 'w') as fp:
             fp.write(self.config.dockerfile.contents)
 
     def build_image(self, **kwargs):
         resp = self.client.api.build(path=self.config.context,
-                                     dockerfile=path.basename(self.config.dockerfile.name),
+                                     dockerfile=os.path.basename(self.config.dockerfile.name),
                                      tag=self.config.tag,
                                      buildargs=self.config.args,
                                      rm=True)
@@ -136,7 +135,7 @@ class Builder:
 def docker_copy(container, src_path, dest_path):
     copy_contents = False
     if src_path.endswith('/.'):
-        src_path = path.dirname(src_path)
+        src_path = os.path.dirname(src_path)
         copy_contents = True
 
     tar_stream, _ = container.get_archive(src_path)
@@ -146,20 +145,20 @@ def docker_copy(container, src_path, dest_path):
         tmp.seek(0)
 
         with tarfile.TarFile(fileobj=tmp) as tf:
-            member = tf.getmember(path.basename(src_path))
+            member = tf.getmember(os.path.basename(src_path))
 
             if not member.isdir():
-                if not path.exists(dest_path) and dest_path.endswith('/'):
+                if not os.path.exists(dest_path) and dest_path.endswith('/'):
                     raise Exception("the destination directory '{}' must exist".format(dest_path))
-                if path.isdir(dest_path):
-                    dest_path = path.join(dest_path, path.basename(member.name))
+                if os.path.isdir(dest_path):
+                    dest_path = os.path.join(dest_path, os.path.basename(member.name))
                 member.name = dest_path
                 tf.extract(member)
 
             else:
-                dest_path_existed = path.exists(dest_path)
+                dest_path_existed = os.path.exists(dest_path)
                 if dest_path_existed:
-                    if not path.isdir(dest_path):
+                    if not os.path.isdir(dest_path):
                         raise Exception('cannot copy a directory to a file')
                 else:
                     os.mkdir(dest_path)

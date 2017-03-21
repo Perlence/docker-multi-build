@@ -1,5 +1,4 @@
 import os
-from os import path
 import time
 
 import docker
@@ -9,7 +8,7 @@ from docker_multi_build.config import BuildConfig, Dockerfile, BuildExport
 from docker_multi_build.build import MultiBuilder, Builder, build_all, docker_copy
 
 
-DIRNAME = path.dirname(__file__)
+DIRNAME = os.path.dirname(__file__)
 
 
 def test_docker_copy(isolated_filesystem, docker_in_docker):
@@ -85,7 +84,7 @@ def test_write_dockerfile(isolated_filesystem):
     )
     builder.config = config_without_inline
     builder.write_dockerfile()
-    assert not path.exists('Dockerfile.image_b')
+    assert not os.path.exists('Dockerfile.image_b')
 
 
 def test_build_all(isolated_filesystem, docker_in_docker):
@@ -118,7 +117,7 @@ ENTRYPOINT ["dumb-init", "--"]
 
     docker_in_docker.images.get('download-dumb-init')
     docker_in_docker.images.get('dumb-init')
-    assert path.exists('dumb-init_1.2.0_amd64')
+    assert os.path.exists('dumb-init_1.2.0_amd64')
 
 
 @pytest.fixture(scope='session')

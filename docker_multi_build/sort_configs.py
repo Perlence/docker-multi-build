@@ -1,5 +1,5 @@
 from collections import OrderedDict
-from os import path
+import os
 import shlex
 
 from .dockerfile import parse
@@ -73,11 +73,11 @@ def is_exported_file_copied(config_a, config_b):
     for export in config_a.exports:
         exported_path = export.dest_path
         if exported_path == '.':
-            exported_path = path.basename(export.container_src_path)
-        exported_path = path.normpath(exported_path)
+            exported_path = os.path.basename(export.container_src_path)
+        exported_path = os.path.normpath(exported_path)
 
         for copied_path in get_copied_paths(config_b):
-            copied_path = path.normpath(copied_path)
+            copied_path = os.path.normpath(copied_path)
             if copied_path.startswith(exported_path):
                 return True
 
