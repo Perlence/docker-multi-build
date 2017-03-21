@@ -22,11 +22,12 @@ with open(join(DIRNAME, 'requirements.in')) as fp:
     install_requires = [get_package_name(line) for line in fp]
 
 setup(
-    name="docker-multi-build",
-    version="0.1.0",
-    description="Multi-stage Docker builds",
-    license="BSD",
-    author="Sviatoslav Abakumov",
+    name='docker-multi-build',
+    version='0.1.0',
+    description='Multi-stage Docker builds',
+    long_description=long_description,
+    license='BSD',
+    author='Sviatoslav Abakumov',
     author_email='dust.harvesting@gmail.com',
     url='https://github.com/Perlence/docker-multi-build',
     packages=find_packages(),
@@ -37,16 +38,19 @@ setup(
         ],
     },
     setup_requires=[
-        'pytest-runner'
+        'pytest-runner',
     ],
     install_requires=install_requires,
     tests_require=[
         'pytest',
     ],
-    long_description=long_description,
     classifiers=[
-        "Programming Language :: Python",
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
+        'Development Status :: 4 - Beta',
+        'Environment :: Console',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: BSD License',
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.6',
     ]
 )
