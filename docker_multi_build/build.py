@@ -101,7 +101,8 @@ class Builder:
         resp = self.client.api.build(path=self.config.context,
                                      dockerfile=path.basename(self.dockerfile_path),
                                      tag=self.config.tag,
-                                     buildargs=self.config.args)
+                                     buildargs=self.config.args,
+                                     rm=True)
         if isinstance(resp, str):
             return self.client.images.get(resp)
 
