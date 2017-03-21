@@ -60,10 +60,10 @@ def get_base_image(config):
     else:
         raise ValueError("Dockerfile of image '{}' doesn't contain FROM-clause".format(config.tag))
 
-    if ':' in base_image:
-        parts = base_image.split(':', 1)
-    elif '@' in base_image:
+    if '@' in base_image:
         parts = base_image.split('@', 1)
+    elif ':' in base_image:
+        parts = base_image.split(':', 1)
     else:
         parts = [base_image]
     return parts[0]
