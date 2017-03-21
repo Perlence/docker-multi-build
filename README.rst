@@ -47,9 +47,13 @@ the builder container to build the application, and get results from another vol
 e.g. to cache downloaded dependencies. Then we ``COPY`` the application that was just built in another ``Dockerfile``,
 build and distribute it.
 
-This approach was detailed, for example, in `Deploying Python Applications with Docker - A Suggestion`_.
+This approach was detailed, for example, in `Deploying Python Applications with Docker - A Suggestion`_, and `Building
+Minimal Docker Containers for Go Applications`_.
 
-.. _Deploying Python Applications with Docker - A Suggestion: https://glyph.twistedmatrix.com/2015/03/docker-deploy-double-dutch.html
+.. _Deploying Python Applications with Docker - A Suggestion:
+      https://glyph.twistedmatrix.com/2015/03/docker-deploy-double-dutch.html
+.. _Building Minimal Docker Containers for Go Applications:
+      https://blog.codeship.com/building-minimal-docker-containers-for-go-applications/
 
 One of the drawbacks of this approach is that it does not utilize Docker cache for actual builds. The command that we
 start in builder container is not cached and must be restarted every time we want to build an application.
@@ -96,6 +100,12 @@ Usage
 Options:
 
 - ``-f``, ``--file PATH`` Specify an alternate multi build file (default: ``docker-multi-build.yml``).
+- ``-H``, ``--host HOST`` Daemon socket to connect to.
+- ``--tls`` Use TLS; implied by ``--tlsverify``.
+- ``--tlscacert CA_PATH`` Trust certs signed only by this CA.
+- ``--tlscert CLIENT_CERT_PATH`` Path to TLS certificate file.
+- ``--tlskey TLS_KEY_PATH`` Path to TLS key file.
+- ``--tlsverify`` Use TLS and verify the remote.
 - ``--help`` Show this message and exit.
 
 To use Multi Build in a container start the following command in a folder with ``docker-multi-build.yml``:
