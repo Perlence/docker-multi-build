@@ -1,0 +1,4 @@
+attrs
+click>=6
+docker
+PyYAML

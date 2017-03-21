@@ -1,9 +1,25 @@
+from os.path import join, dirname
 from setuptools import setup, find_packages
 
+
+def get_package_name(line):
+    """Parse package name from 'requirements.in' line."""
+    parts = line.strip().split('#egg=', 1)
+    if len(parts) > 1:
+        return parts[1]
+    else:
+        return parts[0]
+
+
+DIRNAME = dirname(__file__)
+
 try:
-    long_description = open("README.rst").read()
+    long_description = open(join(DIRNAME, 'README.rst')).read()
 except IOError:
-    long_description = ""
+    long_description = ''
+
+with open(join(DIRNAME, 'requirements.in')) as fp:
+    install_requires = [get_package_name(line) for line in fp]
 
 setup(
     name="docker-multi-build",
@@ -23,12 +39,7 @@ setup(
     setup_requires=[
         'pytest-runner'
     ],
-    install_requires=[
-        'attrs',
-        'click>=6',
-        'docker',
-        'PyYAML',
-    ],
+    install_requires=install_requires,
     tests_require=[
         'pytest',
     ],
