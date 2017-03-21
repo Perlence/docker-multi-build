@@ -1,4 +1,3 @@
-from functools import partial
 import os
 from os import path
 import time
@@ -113,7 +112,7 @@ ENTRYPOINT ["dumb-init", "--"]
 """)),
     }
 
-    b = partial(Builder, client=docker_in_docker)
+    b = Builder(client=docker_in_docker)
     cb = MultiBuilder(builder=b)
     build_all(configs, multi_builder=cb)
 

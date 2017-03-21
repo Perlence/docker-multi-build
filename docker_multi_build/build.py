@@ -33,19 +33,18 @@ class MultiBuilder:
 
     def __attrs_post_init__(self):
         if self.builder is None:
-            self.builder = Builder
+            self.builder = Builder()
         if self.executor is None:
             self.executor = futures.ThreadPoolExecutor()
 
     def build_all(self, configs, all_dependents):
-        self.configs = configs
-        self.all_dependents = all_dependents
+        self = attr.assoc(self, configs=configs, all_dependents=all_dependents)
         self.all_dependencies = self.setup_dependencies()
         self.completed = set()
         to_run = set(self.configs)
         with self.executor:
             while self.completed < to_run:
-                fs = {self.executor.submit(self.builder().build, self.configs[tag]): tag
+                fs = {self.executor.submit(self.builder.build, self.configs[tag]): tag
                       for tag in self.ready_to_build()}
                 for f in futures.as_completed(fs):
                     f.result()
@@ -82,7 +81,7 @@ class Builder:
     dockerfile_path = attr.ib(init=False, repr=False)
 
     def build(self, config):
-        self.config = config
+        self = attr.assoc(self, config=config)
         self.write_dockerfile()
         self.build_image()
         self.export()
