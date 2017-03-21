@@ -2,7 +2,7 @@ Docker Multi Builder
 ====================
 
 Multi Builder is a tool for multi-stage Docker builds. Think of it as Docker Compose for images. With Multi Builder, you
-use a Multi Builder file to split images into build stages, specify dependences between them and thus better utilize
+use a Multi Builder file to split images into build stages, specify dependencies between them and thus better utilize
 Docker image cache. Then, using a single command, you build all the images from your configuration.
 
 A ``docker-multi-build.yml`` looks like this:
@@ -38,8 +38,8 @@ Rationale
 ---------
 
 Building Docker images often involves building applications from source, downloading huge amount of packages from the
-network. In first case, to build an application, we install build tools inside an image via Dockerfile instructions.
-But after application is built, those tools are still present in the image and add to its size. In second case it just
+network. In the first case, to build an application, we install build tools inside an image via Dockerfile instructions.
+But after application is built, those tools are still present in the image and add to its size. In the second case, it just
 takes much time for packages to download, and, most importantly, networks are known to be down.
 
 One of the solutions is to create a *builder image*, install the build utilities there, feed it sources via volumes, run
