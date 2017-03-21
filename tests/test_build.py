@@ -3,6 +3,7 @@ import time
 
 import docker
 import pytest
+import requests
 
 from docker_multi_build.config import BuildConfig, Dockerfile, BuildExport
 from docker_multi_build.build import MultiBuilder, Builder, build_all, docker_copy
@@ -131,11 +132,16 @@ def docker_in_docker():
         volumes={'docker_multi_build_dind_data': {'bind': '/var/lib/docker', 'mode': 'rw'}},
         ports={'2375/tcp': (host, port)})
 
-    while dind.status == 'created':
-        time.sleep(0.1)
-        dind = host_client.containers.get(name)
-
     docker_host = 'tcp://{}:{}'.format(host, port)
-    yield docker.DockerClient(docker_host)
+    client = docker.DockerClient(docker_host)
+    while True:
+        try:
+            client.ping()
+            break
+        except requests.exceptions.ConnectionError:
+            time.sleep(0.1)
+
+    yield client
+
     dind.stop()
     dind.remove()

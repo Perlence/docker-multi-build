@@ -104,7 +104,7 @@ class CustomLoader(yaml.Loader):
 
 def inline_constructor(loader, node):
     # TODO: Raise an error when user tries to use '!inline' in other
-    # place than 'dockerfile'
+    # places than 'dockerfile'
     return io.StringIO(node.value)
 
 
