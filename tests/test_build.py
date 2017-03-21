@@ -6,7 +6,7 @@ import time
 import docker
 import pytest
 
-from docker_multi_build.config import BuildConfig, BuildExport
+from docker_multi_build.config import BuildConfig, Dockerfile, BuildExport
 from docker_multi_build.build import MultiBuilder, Builder, build_all, docker_copy
 
 
@@ -68,27 +68,49 @@ def test_docker_copy(isolated_filesystem, docker_in_docker):
         assert fp.read() == 'son\n'
 
 
+def test_write_dockerfile(isolated_filesystem):
+    builder = Builder(client=None)
+
+    config_with_inline = BuildConfig(
+        tag='image_a',
+        dockerfile=Dockerfile('FROM busybox\nCMD ["/bin/sh"]'),
+    )
+    builder.config = config_with_inline
+    builder.write_dockerfile()
+    with open('Dockerfile.image_a') as fp:
+        assert fp.read() == config_with_inline.dockerfile.contents
+
+    config_without_inline = BuildConfig(
+        tag='image_b',
+        dockerfile=Dockerfile(contents='...', name='Dockerfile.image_b'),
+    )
+    builder.config = config_without_inline
+    builder.write_dockerfile()
+    assert not path.exists('Dockerfile.image_b')
+
+
 def test_build_all(isolated_filesystem, docker_in_docker):
     configs = {
         'download-dumb-init': BuildConfig(
             tag='download-dumb-init',
-            dockerfile="""\
+            dockerfile=Dockerfile("""\
 FROM alpine:3.5
 RUN apk add --no-cache ca-certificates curl
 RUN mkdir /out \
     && cd /out \
     && curl -LO https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64
 CMD ['bin/sh']
-""",
+"""),
             exports=[BuildExport('/out/dumb-init_1.2.0_amd64', '.')]),
+
         'dumb-init': BuildConfig(
             tag='dumb-init',
-            dockerfile="""\
+            dockerfile=Dockerfile("""\
 FROM alpine:3.5
 COPY dumb-init_1.2.0_amd64 /usr/local/bin/dumb-init
 RUN chmod +x /usr/local/bin/dumb-init
 ENTRYPOINT ["dumb-init", "--"]
-"""),
+""")),
     }
 
     b = partial(Builder, client=docker_in_docker)

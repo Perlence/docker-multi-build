@@ -52,7 +52,7 @@ def is_base_image(config_a, config_b):
 
 
 def get_base_image(config):
-    instructions = parse(config.dockerfile.splitlines())
+    instructions = parse(config.dockerfile.contents.splitlines())
     for instr in instructions:
         if instr.name == 'FROM':
             base_image = instr.arguments
@@ -85,7 +85,7 @@ def is_exported_file_copied(config_a, config_b):
 
 
 def get_copied_paths(config):
-    instructions = parse(config.dockerfile.splitlines())
+    instructions = parse(config.dockerfile.contents.splitlines())
     for instr in instructions:
         if instr.name in ('COPY', 'ADD'):
             args = shlex.split(instr.arguments)

@@ -2,22 +2,29 @@ import io
 
 import attr
 from attr import NOTHING, Factory
+from attr.validators import instance_of
 import yaml
 
 
 @attr.s
-class BuildConfig:
-    tag = attr.ib()
-    dockerfile = attr.ib(repr=False)
-    context = attr.ib(default='.')
-    args = attr.ib(default=Factory(dict))
-    exports = attr.ib(default=Factory(list))
+class Dockerfile:
+    contents = attr.ib()
+    name = attr.ib(default=None)
 
 
 @attr.s
 class BuildExport:
     container_src_path = attr.ib()
     dest_path = attr.ib()
+
+
+@attr.s
+class BuildConfig:
+    tag = attr.ib()
+    dockerfile = attr.ib(validator=instance_of(Dockerfile), repr=False)
+    context = attr.ib(default='.')
+    args = attr.ib(default=Factory(dict))
+    exports = attr.ib(default=Factory(list))
 
 
 def load(stream):
@@ -47,13 +54,20 @@ def _load_build_config(tag, raw_config):
 
 
 def _load_dockerfile(path_or_stream):
+    contents = ''
+    name = None
     try:
         path_or_stream.read
     except AttributeError:
         with open(path_or_stream) as fp:
-            return fp.read()
+            contents = fp.read()
     else:
-        return path_or_stream.read()
+        contents = path_or_stream.read()
+        try:
+            name = path_or_stream.name
+        except AttributeError:
+            pass
+    return Dockerfile(contents, name=name)
 
 
 def _load_exports(raw_exports):
@@ -70,7 +84,7 @@ class CustomLoader(yaml.Loader):
 
 def inline_constructor(loader, node):
     # TODO: Raise an error when user tries to use '!inline' in other
-    # place then 'dockerfile'
+    # place than 'dockerfile'
     return io.StringIO(node.value)
 
 

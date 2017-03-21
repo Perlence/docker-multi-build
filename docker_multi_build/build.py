@@ -76,34 +76,32 @@ class MultiBuilder:
 
 @attr.s
 class Builder:
-    client = attr.ib(default=None, repr=False)
+    client = attr.ib(default=attr.Factory(docker.from_env), repr=False)
 
     config = attr.ib(init=False, repr=False)
     dockerfile_path = attr.ib(init=False, repr=False)
 
-    def __attrs_post_init__(self):
-        if self.client is None:
-            self.client = docker.from_env()
-
     def build(self, config):
         self.config = config
-        self.dockerfile_path = path.join(self.config.context, 'Dockerfile.' + self.config.tag)
         self.write_dockerfile()
         self.build_image()
         self.export()
 
     def write_dockerfile(self):
-        # TODO: Don't write Dockerfile if it's not inline
         # TODO: Location of Dockerfile must be relative to
         # docker-multi-build.yml
-        with open(self.dockerfile_path, 'w') as fp:
-            fp.write(self.config.dockerfile)
+        if self.config.dockerfile.name is not None:
+            return
+
+        self.config.dockerfile.name = path.join(self.config.context, 'Dockerfile.' + self.config.tag)
+        with open(self.config.dockerfile.name, 'w') as fp:
+            fp.write(self.config.dockerfile.contents)
 
     def build_image(self, **kwargs):
         # TODO: Context must point to a folder relative to
         # docker-multi-build.yml
         resp = self.client.api.build(path=self.config.context,
-                                     dockerfile=path.basename(self.dockerfile_path),
+                                     dockerfile=path.basename(self.config.dockerfile.name),
                                      tag=self.config.tag,
                                      buildargs=self.config.args,
                                      rm=True)
