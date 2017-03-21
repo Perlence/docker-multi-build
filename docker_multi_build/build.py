@@ -87,8 +87,6 @@ class Builder:
         self.export()
 
     def write_dockerfile(self):
-        # TODO: Location of Dockerfile must be relative to
-        # docker-multi-build.yml
         if self.config.dockerfile.name is not None:
             return
 
@@ -97,8 +95,6 @@ class Builder:
             fp.write(self.config.dockerfile.contents)
 
     def build_image(self, **kwargs):
-        # TODO: Context must point to a folder relative to
-        # docker-multi-build.yml
         resp = self.client.api.build(path=self.config.context,
                                      dockerfile=path.basename(self.config.dockerfile.name),
                                      tag=self.config.tag,

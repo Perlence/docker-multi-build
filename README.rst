@@ -27,8 +27,7 @@ A ``docker-multi-build.yml`` looks like this:
            && curl -LO https://github.com/Yelp/dumb-init/releases/download/v1.2.0/dumb-init_1.2.0_amd64
        CMD ['bin/sh']
 
-Check out docker-multi-build.yml_ for a more "real life" example of build
-configuration.
+Check out docker-multi-build.yml_ for a more "real life" example of build configuration.
 
 .. _docker-multi-build.yml: https://github.com/Perlence/docker-multi-builder/blob/master/docker-multi-build.yml
 
@@ -103,7 +102,10 @@ To use Multi Build in a container start the following command in a folder with `
 
 .. code-block:: bash
 
-   docker run --rm -it -v /var/run/docker.sock:/var/run/docker.sock -v $PWD:/src Perlence/docker-multi-build:0.1
+   docker run --rm -t \
+       -v /var/run/docker.sock:/var/run/docker.sock \
+       -v $PWD:/src \
+       Perlence/docker-multi-build:0.1 -f /src/docker-multi-builder.yml
 
 
 Multi Builder file reference

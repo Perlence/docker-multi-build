@@ -10,7 +10,7 @@ docker-multi-build:
         && pip install --no-index --find-links=wheelhouse docker_multi_build \
         && ln -s /usr/local/venvs/docker-multi-build/bin/docker-multi-build /usr/local/bin/ \
         && rm -r wheelhouse/
-    WORKDIR /src
+    WORKDIR /
     ENTRYPOINT ["/usr/local/bin/docker-multi-build"]
 
 dmb-dep-wheels:
