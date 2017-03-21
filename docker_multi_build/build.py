@@ -94,10 +94,14 @@ class Builder:
 
     def write_dockerfile(self):
         # TODO: Don't write Dockerfile if it's not inline
+        # TODO: Location of Dockerfile must be relative to
+        # docker-multi-build.yml
         with open(self.dockerfile_path, 'w') as fp:
             fp.write(self.config.dockerfile)
 
     def build_image(self, **kwargs):
+        # TODO: Context must point to a folder relative to
+        # docker-multi-build.yml
         resp = self.client.api.build(path=self.config.context,
                                      dockerfile=path.basename(self.dockerfile_path),
                                      tag=self.config.tag,

@@ -10,8 +10,9 @@ CLI_DEFAULT_FILE = 'docker-multi-build.yml'
 
 @click.command()
 @click.option('-f', '--file', metavar='PATH', type=click.Path(exists=True), default=CLI_DEFAULT_FILE,
-              help='Specify an alternate multi-build file (default: {}'.format(CLI_DEFAULT_FILE))
+              help='Specify an alternate multi-build file (default: {}).'.format(CLI_DEFAULT_FILE))
 def cli(file):
+    # TODO: Add '-H' option.
     cli = CLI(file)
     build.build_all(cli.configs)
 
