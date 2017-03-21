@@ -8,10 +8,10 @@ docker-multi-build:
         && python -m venv venvs/docker-multi-build \
         && . venvs/docker-multi-build/bin/activate \
         && pip install --no-index --find-links=wheelhouse docker_multi_build \
-        && cp /usr/local/venvs/docker-multi-build/bin/docker-multi-build /usr/local/bin/ \
+        && ln -s /usr/local/venvs/docker-multi-build/bin/docker-multi-build /usr/local/bin/ \
         && rm -r wheelhouse/
     WORKDIR /src
-    ENTRYPOINT ["/usr/local/venvs/docker-multi-build/bin/docker-multi-build"]
+    ENTRYPOINT ["/usr/local/bin/docker-multi-build"]
 
 dmb-dep-wheels:
   exports:
