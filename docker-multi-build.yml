@@ -1,0 +1,48 @@
+docker-multi-build:
+  dockerfile: !inline |
+    FROM python:3.6-alpine
+    WORKDIR /usr/local
+    COPY wheelhouse/ wheelhouse/
+    COPY dist/ wheelhouse/
+    RUN mkdir venvs \
+        && python -m venv venvs/docker-multi-build \
+        && . venvs/docker-multi-build/bin/activate \
+        && pip install --no-index --find-links=wheelhouse docker_multi_build \
+        && cp /usr/local/venvs/docker-multi-build/bin/docker-multi-build /usr/local/bin/ \
+        && rm -r wheelhouse/
+    WORKDIR /src
+    ENTRYPOINT ["/usr/local/venvs/docker-multi-build/bin/docker-multi-build"]
+
+dmb-dep-wheels:
+  exports:
+    - /out/.:wheelhouse
+  dockerfile: !inline |
+    FROM dmb-builder-base
+    COPY requirements.txt .
+    COPY wheelhouse/ wheelhouse/
+    RUN . py36/bin/activate \
+        && mkdir /out \
+        && pip wheel \
+             --wheel-dir=/out \
+             --find-links=wheelhouse \
+             -r requirements.txt
+
+dmb-wheel:
+  exports:
+    - /out/.:dist
+  dockerfile: !inline |
+    FROM dmb-builder-base
+    COPY requirements.in .
+    COPY setup.py .
+    COPY docker_multi_build/ docker_multi_build/
+    RUN . py36/bin/activate \
+        && mkdir /out \
+        && python setup.py bdist_wheel --dist-dir /out
+
+dmb-builder-base:
+  dockerfile: !inline |
+    FROM python:3.6-alpine
+    WORKDIR /src
+    RUN python -m venv py36 \
+        && . py36/bin/activate \
+        && pip install wheel
