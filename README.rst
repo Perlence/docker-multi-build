@@ -108,7 +108,7 @@ Options:
 - ``--tlsverify`` Use TLS and verify the remote.
 - ``--help`` Show this message and exit.
 
-To use Multi Build in a container start the following command in a folder with ``docker-multi-build.yml``:
+To use Multi Builder in a container start the following command in a folder with ``docker-multi-build.yml``:
 
 .. code-block:: bash
 
@@ -121,8 +121,8 @@ To use Multi Build in a container start the following command in a folder with `
 Multi Builder file reference
 ----------------------------
 
-Top-level keys define a single build configuration and give it a name. The order in which builds will be started is
-determined by the same topological sort algorithm that's used in Docker Compose. An image A depends on image B, if
+Top-level keys define build configurations and give them names. The order in which builds will be started is determined
+by the same topological sort algorithm that's used in Docker Compose. An image A depends on image B, if
 
 - image B is base image of image A
 - image B exports files that are copied by image A
@@ -154,13 +154,13 @@ context
 
 A path to a directory containing a Dockerfile.
 
-When the value supplied is a relative path, it is interpreted as relative to the location of the Compose file. This
-directory is also the build context that is sent to the Docker daemon.
+When the value supplied is a relative path, it is interpreted as relative to the location of the Multi Builder file.
+This directory is also the build context that is sent to the Docker daemon.
 
 dockerfile
 ``````````
 
-Either a path to a Dockerfile, or an in-line Dockerfile. Defaults to ``Dockerfile`` if not set.
+Either a path to a Dockerfile, or an in-line Dockerfile. Defaults to ``Dockerfile`` path if not set.
 
 If in-line Dockerfile is specified, then it will be saved to disk as ``Dockerfile.<tag>`` before sending the build
 context to Docker daemon.
