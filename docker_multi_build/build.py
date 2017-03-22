@@ -72,6 +72,19 @@ class MultiBuilder:
 
 
 @attr.s
+class SequentialMultiBuilder:
+    builder = attr.ib(default=None)
+
+    def __attrs_post_init__(self):
+        if self.builder is None:
+            self.builder = Builder()
+
+    def build_all(self, configs, all_dependents):
+        for tag in all_dependents:
+            self.builder.build(configs[tag])
+
+
+@attr.s
 class Builder:
     client = attr.ib(default=attr.Factory(docker.from_env), repr=False)
 

@@ -13,6 +13,8 @@ CLI_DEFAULT_FILE = 'docker-multi-build.yml'
 @click.command()
 @click.option('-f', '--file', metavar='PATH', type=click.File(), default=CLI_DEFAULT_FILE,
               help='Specify an alternate multi-build file (default: {}).'.format(CLI_DEFAULT_FILE))
+@click.option('--concurrent/--no-concurrent', default=True,
+              help='Run builds concurrently (default: True).')
 @click.option('-H', '--host', metavar='HOST', envvar='DOCKER_HOST', default=None,
               help='Daemon socket to connect to.')
 @click.option('--tls', is_flag=True,
@@ -25,12 +27,15 @@ CLI_DEFAULT_FILE = 'docker-multi-build.yml'
               help='Path to TLS key file.')
 @click.option('--tlsverify', envvar='DOCKER_TLS_VERIFY', is_flag=True,
               help='Use TLS and verify the remote.')
-def cli(file, host, tls, tlscacert, tlscert, tlskey, tlsverify):
+def cli(file, concurrent, host, tls, tlscacert, tlscert, tlskey, tlsverify):
     configs = config.load(file)
     tls_config = load_tls_config(tls, tlscacert, tlscert, tlskey, tlsverify)
     client = docker.DockerClient(host, tls=tls_config)
     b = build.Builder(client)
-    mb = build.MultiBuilder(builder=b)
+    if concurrent:
+        mb = build.MultiBuilder(builder=b)
+    else:
+        mb = build.SequentialMultiBuilder(builder=b)
     build.build_all(configs, multi_builder=mb)
 
 
