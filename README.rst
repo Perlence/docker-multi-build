@@ -29,7 +29,7 @@ A ``docker-multi-build.yml`` looks like this:
 
 Check out docker-multi-build.yml_ for a more "real life" example of build configuration.
 
-.. _docker-multi-build.yml: https://github.com/Perlence/docker-multi-builder/blob/master/docker-multi-build.yml
+.. _docker-multi-build.yml: https://github.com/Perlence/docker-multi-build/blob/master/docker-multi-build.yml
 
 .. contents::
 
