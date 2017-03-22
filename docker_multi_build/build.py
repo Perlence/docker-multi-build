@@ -2,7 +2,6 @@ from concurrent import futures
 import os
 import re
 import tarfile
-import tempfile
 
 import attr
 import docker
@@ -139,33 +138,25 @@ def docker_copy(container, src_path, dest_path):
         copy_contents = True
 
     tar_stream, _ = container.get_archive(src_path)
-    with tempfile.TemporaryFile() as tmp:
-        for chunk in tar_stream:
-            tmp.write(chunk)
-        tmp.seek(0)
-
-        with tarfile.TarFile(fileobj=tmp) as tf:
-            member = tf.getmember(os.path.basename(src_path))
-
-            if not member.isdir():
-                if not os.path.exists(dest_path) and dest_path.endswith('/'):
-                    raise Exception("the destination directory '{}' must exist".format(dest_path))
-                if os.path.isdir(dest_path):
-                    dest_path = os.path.join(dest_path, os.path.basename(member.name))
-                member.name = dest_path
-                tf.extract(member)
-
+    with tarfile.open(fileobj=tar_stream, mode='r|') as tf:
+        tfi = iter(tf)
+        member = next(tfi)
+        if not member.isdir():
+            if not os.path.exists(dest_path) and dest_path.endswith('/'):
+                raise Exception("the destination directory '{}' must exist".format(dest_path))
+            if os.path.isdir(dest_path):
+                dest_path = os.path.join(dest_path, os.path.basename(member.name))
+            member.name = dest_path
+            tf.extract(member)
+        else:
+            dest_path_existed = os.path.exists(dest_path)
+            if dest_path_existed:
+                if not os.path.isdir(dest_path):
+                    raise Exception('cannot copy a directory to a file')
             else:
-                dest_path_existed = os.path.exists(dest_path)
-                if dest_path_existed:
-                    if not os.path.isdir(dest_path):
-                        raise Exception('cannot copy a directory to a file')
-                else:
-                    os.mkdir(dest_path)
-                for m in tf.members:
-                    if not copy_contents and dest_path_existed:
-                        if m.name.startswith(member.name):
-                            tf.extract(m, dest_path)
-                    elif m != member and m.name.startswith(member.name):
+                os.mkdir(dest_path)
+            for m in tfi:
+                if m.name.startswith(member.name):
+                    if copy_contents or not dest_path_existed:
                         m.name = m.name.replace(member.name + '/', '', 1)
-                        tf.extract(m, dest_path)
+                    tf.extract(m, dest_path)

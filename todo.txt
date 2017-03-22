@@ -1,5 +1,5 @@
 x 2017-03-21 2017-03-21 Replace 'isolated_filesystem' fixture with 'tmpdir' @tests
-2017-03-21 Profile 'docker_copy' function, it seems slow @build
+x 2017-03-22 2017-03-21 Profile 'docker_copy' function, it seems slow @build
 2017-03-21 Add option to start sequential build @cli @build
 2017-03-21 Raise an error when user tries to use '!inline' in other places than 'dockerfile' @config
 2017-03-20 Redirect image pull logs @build @log
